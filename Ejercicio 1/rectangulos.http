@@ -1,0 +1,42 @@
+@Url = http://localhost:3000
+
+### Crear rectángulo
+POST {{Url}}/rectangulos
+Content-Type: application/json
+
+{
+  "ancho": 10,
+  "alto": 5
+}
+
+###
+
+### Crear cuadrado
+POST {{Url}}/rectangulos
+Content-Type: application/json
+
+{
+  "ancho": 7,
+  "alto": 7
+}
+
+###
+
+### Ver todos los rectángulos
+GET {{Url}}/rectangulos
+
+###
+
+### Modificar un rectángulo
+PUT {{Url}}/rectangulos/1
+Content-Type: application/json
+
+{
+  "ancho": 12,
+  "alto": 6
+}
+
+###
+
+### Eliminar un rectángulo
+DELETE {{Url}}/rectangulos/1
