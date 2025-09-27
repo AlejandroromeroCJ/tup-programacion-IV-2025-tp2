@@ -1,0 +1,27 @@
+@Url = http://localhost:3000
+
+### Crear alumno
+POST {{Url}}/alumnos
+Content-Type: application/json
+
+{
+  "nombre": "Armando Estebanquito",
+  "materia": "Matemática",
+  "notas": [8, 7, 9]
+}
+
+### Listar alumnos
+GET {{Url}}/alumnos
+
+### Actualizar alumno
+PUT {{Url}}/alumnos/1
+Content-Type: application/json
+
+{
+  "nuevoNombre": "Armando Estebanquito",
+  "materia": "Matemática",
+  "notas": [9, 8, 10]
+}
+
+### Eliminar alumno
+DELETE {{Url}}/alumnos/1
