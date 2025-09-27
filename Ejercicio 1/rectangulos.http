@@ -5,8 +5,8 @@ POST {{Url}}/rectangulos
 Content-Type: application/json
 
 {
-  "ancho": 10,
-  "alto": 5
+  "ancho": 30,
+  "alto": 20
 }
 
 ###
@@ -28,15 +28,15 @@ GET {{Url}}/rectangulos
 ###
 
 ### Modificar un rectángulo
-PUT {{Url}}/rectangulos/1
+PUT {{Url}}/rectangulos/6
 Content-Type: application/json
 
 {
-  "ancho": 12,
-  "alto": 6
+  "ancho": 40,
+  "alto": 20
 }
 
 ###
 
 ### Eliminar un rectángulo
-DELETE {{Url}}/rectangulos/1
+DELETE {{Url}}/rectangulos/5

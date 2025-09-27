@@ -1,6 +1,7 @@
 import express from "express";
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
+import { body, param, validationResult } from "express-validator";
 
 dotenv.config();
 
@@ -16,66 +17,87 @@ const db = await mysql.createConnection({
   database: process.env.DB_NAME,
 });
 
-// POST → Crear rectángulo
-app.post("/rectangulos", async (req, res) => {
-  const { ancho, alto } = req.body;
-
-  if (typeof ancho !== "number" || typeof alto !== "number" || ancho <= 0 || alto <= 0) {
-    return res.status(400).json({ error: "ancho y alto deben ser números > 0" });
+const validar = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errores: errors.array() });
   }
+  next();
+};
 
-  const perimetro = 2 * (ancho + alto);
-  const superficie = ancho * alto;
+// POST → Crear rectángulo
+app.post(
+  "/rectangulos",
+  [
+    body("ancho").isFloat({ gt: 0 }).withMessage("El ancho debe ser un número mayor que 0"),
+    body("alto").isFloat({ gt: 0 }).withMessage("El alto debe ser un número mayor que 0"),
+    validar,
+  ],
+  async (req, res) => {
+    const { ancho, alto } = req.body;
+    const perimetro = 2 * (ancho + alto);
+    const superficie = ancho * alto;
 
-  const [result] = await db.execute(
-    "INSERT INTO rectangulos (ancho, alto, perimetro, superficie) VALUES (?, ?, ?, ?)",
-    [ancho, alto, perimetro, superficie]
-  );
+    const [result] = await db.execute(
+      "INSERT INTO rectangulos (ancho, alto, perimetro, superficie) VALUES (?, ?, ?, ?)",
+      [ancho, alto, perimetro, superficie]
+    );
 
-  res.status(201).json({
-    id: result.insertId,
-    ancho,
-    alto,
-    perimetro,
-    superficie,
-  });
-});
+    res.status(201).json({
+      id: result.insertId,
+      ancho,
+      alto,
+      perimetro,
+      superficie,
+    });
+  }
+);
 
 // GET → Ver todos los rectángulos
-app.get("/rectangulos", async (req, res) => {
+app.get("/rectangulos", async (_req, res) => {
   const [rows] = await db.execute("SELECT * FROM rectangulos");
   res.json(rows);
 });
 
-
 // PUT → Modificar un rectángulo
-app.put("/rectangulos/:id", async (req, res) => {
-  const id = Number(req.params.id);
-  const { ancho, alto } = req.body;
+app.put(
+  "/rectangulos/:id",
+  [
+    param("id").isInt({ min: 1 }).withMessage("El ID debe ser un número entero positivo"),
+    body("ancho").isFloat({ gt: 0 }).withMessage("El ancho debe ser un número mayor que 0"),
+    body("alto").isFloat({ gt: 0 }).withMessage("El alto debe ser un número mayor que 0"),
+    validar,
+  ],
+  async (req, res) => {
+    const id = Number(req.params.id);
+    const { ancho, alto } = req.body;
 
-  if (typeof ancho !== "number" || typeof alto !== "number" || ancho <= 0 || alto <= 0) {
-    return res.status(400).json({ error: "ancho y alto deben ser números > 0" });
+    const perimetro = 2 * (ancho + alto);
+    const superficie = ancho * alto;
+
+    await db.execute(
+      "UPDATE rectangulos SET ancho=?, alto=?, perimetro=?, superficie=? WHERE id=?",
+      [ancho, alto, perimetro, superficie, id]
+    );
+
+    res.json({ id, ancho, alto, perimetro, superficie });
   }
-
-  const perimetro = 2 * (ancho + alto);
-  const superficie = ancho * alto;
-
-  await db.execute(
-    "UPDATE rectangulos SET ancho=?, alto=?, perimetro=?, superficie=? WHERE id=?",
-    [ancho, alto, perimetro, superficie, id]
-  );
-
-  res.json({ id, ancho, alto, perimetro, superficie });
-});
+);
 
 // DELETE → Eliminar un rectángulo
-app.delete("/rectangulos/:id", async (req, res) => {
-  const id = Number(req.params.id);
-
-  await db.execute("DELETE FROM rectangulos WHERE id=?", [id]);
-  res.json({ success: true, id });
-});
+app.delete(
+  "/rectangulos/:id",
+  [
+    param("id").isInt({ min: 1 }).withMessage("El ID debe ser un número entero positivo"),
+    validar,
+  ],
+  async (req, res) => {
+    const id = Number(req.params.id);
+    await db.execute("DELETE FROM rectangulos WHERE id=?", [id]);
+    res.json({ success: true, id });
+  }
+);
 
 app.listen(port, () => {
-  console.log(`La aplicación esta funcionando en el puerto ${port}`);
+  console.log(`La aplicación está funcionando en el puerto ${port}`);
 });
