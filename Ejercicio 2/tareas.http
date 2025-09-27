@@ -1,0 +1,57 @@
+@Url = http://localhost:3000
+
+### Probar si la API responde
+GET {{Url}}/
+
+###
+
+### Crear una tarea (pendiente)
+POST {{Url}}/tareas
+Content-Type: application/json
+
+{
+  "descripcion": "Comprar pan",
+  "completada": false
+}
+
+###
+
+### Crear otra tarea (pendiente)
+POST {{Url}}/tareas
+Content-Type: application/json
+
+{
+  "descripcion": "Estudiar NodeJS",
+  "completada": false
+}
+
+###
+
+### Crear una tarea ya completada
+POST {{Url}}/tareas
+Content-Type: application/json
+
+{
+  "descripcion": "Salir a trotar",
+  "completada": true
+}
+
+###
+
+### Ver todas las tareas
+GET {{Url}}/tareas
+
+###
+
+### Ver solo tareas completadas
+GET {{Url}}/tareas?completada=true
+
+###
+
+### Ver solo tareas pendientes
+GET {{Url}}/tareas?completada=false
+
+###
+
+### Eliminar tarea por ID (ejemplo id=1)
+DELETE {{Url}}/tareas/1
